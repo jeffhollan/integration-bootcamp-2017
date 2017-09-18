@@ -114,3 +114,44 @@ Next we will add a custom Event Grid topic to emit these events to.
 
 ## Creating a custom Azure Event Grid topic
 
+Let's create a custom event grid topic to emit an event that a customer support email was received.
+
+1. Click the **Cloud Shell** icon on the top of the screen and get a terminal working (may require creating a storage account)  
+    ![](images/13.png)  
+1. Type in the following command:
+    * `gridResourceGroup` should be the name of the resource group your Function/Logic App are in
+    * `name` needs to be **globally unique**
+    ```
+    az eventgrid topic create --name <name> -l westus2 -g <gridResourceGroup>
+    ```
+    ![](images/14.png)  
+1. Copy the endpoint from the response (in the screenshot mine was `https://customeremails1224.westus2-1.eventgrid.azure.net/api/events`) and save it for future referenece
+1. Enter the following command to get a key to send events:
+    * `gridResourceGroup` should be the name of the resource group your Function/Logic App are in
+    * `name` needs to be the name created above
+    ```
+    az eventgrid topic key list --name <name> -g <gridResourceGroup> --query "key1" --output tsv
+    ```
+    ![](images/15.png)
+1. Copy the key and save it for future reference.
+
+We now have a custom Event Grid topic we can send events to.
+
+## Sending events to the Event Grid
+
+1. Close the cloud shell and go back to your logic app editor.
+1. Add a new action and select the **Azure Event Grid Publish** connector and the **Publish Event** action.
+1. Give it any name you want (`CustomerEmail` is fine), and paste in the endpoint and key from the previous section.  
+    ![](images/16.png)  
+1. For the ID of the event, select the **Expression** tab and use the `guid()` expression to generate a GUID.  
+    ![](images/17.png)  
+1. The subject is the subject of the event.  For resource events this would be the Azure Resource ID.  For this let's use the CustomerName as the subject.
+1. The event type would be `CustomerEmail/Support`
+1. The data is the data to be included in the event. We could craft an object, but for now let's just pass in the output of the Azure Function (that full object). You could choose either the **Parse JSON** body or the **Function** body.  
+    ![](images/18.png)  
+1. Click **Save**
+1. Send a few more emails with the appropriate format to test your serverless app end-to-end.
+
+## Extra Credit
+
+Create a second logic app that will SUBSCRIBE (trigger) on the events from this one.  Perform some action whenever a new support email event occurs.
