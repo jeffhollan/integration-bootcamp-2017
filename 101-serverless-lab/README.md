@@ -118,6 +118,10 @@ Let's create a custom event grid topic to emit an event that a customer support 
 
 1. Click the **Cloud Shell** icon on the top of the screen and get a terminal working (may require creating a storage account)  
     ![](images/13.png)  
+1. You may need to set the right subscription ID if you have multiple subscriptions:
+    ```
+    az account set -s <yourSubscriptionId>
+    ```
 1. Type in the following command:
     * `gridResourceGroup` should be the name of the resource group your Function/Logic App are in
     * `name` needs to be **globally unique**
@@ -125,7 +129,7 @@ Let's create a custom event grid topic to emit an event that a customer support 
     az eventgrid topic create --name <name> -l westus2 -g <gridResourceGroup>
     ```
     ![](images/14.png)  
-1. Copy the endpoint from the response (in the screenshot mine was `https://customeremails1224.westus2-1.eventgrid.azure.net/api/events`) and save it for future referenece
+1. Copy the endpoint from the response (in the screenshot mine was `https://customeremails1224.westus2-1.eventgrid.azure.net/api/events`) and save it for future reference.  **You may need to right-click "copy" as Ctrl+C doesn't always work in console emulator**
 1. Enter the following command to get a key to send events:
     * `gridResourceGroup` should be the name of the resource group your Function/Logic App are in
     * `name` needs to be the name created above
