@@ -286,3 +286,21 @@ The logic apps will then continue and complete by routing the message the
 
 You should now see the Logic App completed and routed the message to the
 **approvedqueue**.
+
+--------------
+
+# Configuring a timeout for the approval
+
+By default the user has as long as the lifetime of the workflow to approve (that's 90 days).  However we likely don't want to wait 90 days to finish this workflow.  So let's configure the Approval action to timeout.
+
+1. Open the settings on the **Send approval email** step  
+    ![](16.png)  
+1. Notice the timeout property.  This is ISO 8601 format for a time duration and can be set to any duration.  For testing purposes let's timeout after 30 seconds.  Enter `PT30S` into the timeout field.
+    ![](17.png)  
+    * If you ran this now and DIDN'T approve, the send approval action would Fail with status `TimedOut`, it would skip the condition and deadletter the message.  However instead of failing let's escalate.
+1. Click the "+" **directly** below the Send Approval Email action, select **Add a parallel branch** and add a **Send email** action.  
+    ![](18.png)  
+1. Configure the action to send an email to yourself to escalate.  However if you ran this now it would run if the Send Approval was successful.  So we need to change the "Run After Configuration" to run if the approval times out.  
+1. Click the settings menu on the "Send email" step.
+1. Select **Configure run after**, deselect "Success" and select "Timed Out".  This way the "Send Email" will only run if the previous action (approval) times out.
+1. Click save, run your app (send a message to the queue).  See if you can follow both paths - one where you approve within 30 seconds, the other where you do not.
